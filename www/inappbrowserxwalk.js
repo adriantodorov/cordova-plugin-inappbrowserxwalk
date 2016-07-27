@@ -1,7 +1,7 @@
 /*global cordova, module*/
 
 function InAppBrowserXwalk() {
-
+ 
 }
 
 var callbacks = new Array ();
@@ -21,23 +21,27 @@ InAppBrowserXwalk.prototype = {
     },
     hide: function () {
         cordova.exec(null, null, "InAppBrowserXwalk", "hide", []);
+    },
+    stopLoading: function (scrpt) {
+        cordova.exec(null, null, "InAppBrowserXwalk", "stopLoading", []);
+    },
+    executeScript: function (scrpt) {
+        cordova.exec(null, null, "InAppBrowserXwalk", "executeScript", [scrpt]);
     }
 }
 
 var callback = function(event) {
-    switch (event.type) {
-        case 'loadstart':
-            callbacks['loadstart'] !== undefined && callbacks['loadstart'](event);
-            break;
-        case 'loadstop':
-            callbacks['loadstop'] !== undefined && callbacks['loadstop'](event);
-            break;
-        case 'loaderror':
-            callbacks['loaderror'] !== undefined && callbacks['loaderror'](event);
-            break;
-        case 'exit':
-            callbacks['exit'] != undefined && callbacks['exit']();
-            break;
+    if (event.type === "loadstart" && callbacks['loadstart'] !== undefined) {
+        callbacks['loadstart'](event.url);
+    }
+    if (event.type === "loadstop" && callbacks['loadstop'] !== undefined) {
+        callbacks['loadstop'](event.url);
+    }
+    if (event.type === "exit" && callbacks['exit'] !== undefined) {
+        callbacks['exit']();
+    }
+    if (event.type === "jsCallback" && callbacks['jsCallback'] !== undefined) {
+        callbacks['jsCallback'](event.result);
     }
 }
 
